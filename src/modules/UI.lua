@@ -69,6 +69,9 @@ function UI:CreateWindow(title)
     CloseBtn.TextSize = 24
     
     CloseBtn.MouseButton1Click:Connect(function()
+        if getgenv().KCheat and getgenv().KCheat.ModuleHandler then
+            getgenv().KCheat.ModuleHandler:Shutdown()
+        end
         ScreenGui:Destroy()
         if getgenv().KCheat and getgenv().KCheat.Connections then
             for _, conn in pairs(getgenv().KCheat.Connections) do
@@ -210,6 +213,11 @@ function UI:CreateWindow(title)
             if input.UserInputType == Enum.UserInputType.MouseButton1 then
                 Module.State = not Module.State
                 updateAppearance()
+                
+                if not Module.State and getgenv().KCheat.ModuleHandler then
+                    getgenv().KCheat.ModuleHandler:StopModule(name)
+                end
+                
                 callback(Module.State)
             elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
                 showSettings()

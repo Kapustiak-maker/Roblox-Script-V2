@@ -22,8 +22,11 @@ local function safeLoad(path)
     return func()
 end
 
--- 1. Load UI Library
-print("[K. Cheat] Loading UI...")
+-- 1. Load Core Modules
+print("[K. Cheat] Loading Core Modules...")
+local ModuleHandler = safeLoad("src/modules/ModuleHandler.lua")
+KCheat.ModuleHandler = ModuleHandler
+
 local UI = safeLoad("src/modules/UI.lua")
 if not UI then 
     warn("[K. Cheat] Critical Error: Could not load UI library.")
@@ -36,10 +39,8 @@ local Window = UI:CreateWindow("K. CHEAT")
 KCheat.Window = Window
 
 -- 3. Load Function Modules
--- Each function is a separate file in /src/Functions/
 local functions = {
-    "src/Functions/Speed.lua",
-    "src/Functions/Visuals.lua"
+    "src/Functions/ESP.lua"
 }
 
 print("[K. Cheat] Loading Function Modules...")
