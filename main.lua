@@ -1,4 +1,4 @@
--- [[ RED DRAGON HUB - BOOTSTRAPPER ]]
+-- [[ K. CHEAT - BOOTSTRAPPER ]]
 -- Developed for @Kapustiak-maker
 
 local repoName = "Roblox-Script-V2"
@@ -6,13 +6,14 @@ local userName = "Kapustiak-maker"
 local branch = "main"
 
 -- Global configuration
-getgenv().RedDragon = {
-    Name = "Red Dragon",
-    Version = "1.0.0",
-    Theme = Color3.fromRGB(220, 20, 20),
+getgenv().KCheat = {
+    Name = "K. Cheat",
+    Version = "2.0.0",
+    Theme = Color3.fromRGB(150, 100, 250), -- Purple
     Settings = {},
     Modules = {},
-    IsLocal = false -- Set to true for local development
+    IsLocal = false, -- Set to true for local development
+    Connections = {} -- For clean shutdown
 }
 
 local function loadRemote(path)
@@ -21,33 +22,32 @@ local function loadRemote(path)
     
     local success, content = pcall(function() return game:HttpGet(url) end)
     if not success or not content or content == "" then 
-        warn("[Red Dragon] Failed to download: " .. path)
+        warn("[K. Cheat] Failed to download: " .. path)
         return nil 
     end
     
     local func, err = loadstring(content)
     if not func then 
-        warn("[Red Dragon] Syntax Error in " .. path .. ": " .. tostring(err))
+        warn("[K. Cheat] Syntax Error in " .. path .. ": " .. tostring(err))
         return nil 
     end
     
     local runSuccess, runErr = pcall(func)
     if not runSuccess then
-        warn("[Red Dragon] Execution Error in " .. path .. ": " .. tostring(runErr))
+        warn("[K. Cheat] Execution Error in " .. path .. ": " .. tostring(runErr))
     end
 end
 
 local function loadLocal(path)
-    -- This requires the executor to have read-file capabilities (most do)
-    local success, content = pcall(function() return readfile("RedDragon/" .. path) end)
+    local success, content = pcall(function() return readfile("KCheat/" .. path) end)
     if not success then
-        warn("[Red Dragon] Local file not found: " .. path)
+        warn("[K. Cheat] Local file not found: " .. path)
         return nil
     end
 
     local func, err = loadstring(content)
     if not func then 
-        warn("[Red Dragon] Syntax Error in " .. path .. ": " .. tostring(err))
+        warn("[K. Cheat] Syntax Error in " .. path .. ": " .. tostring(err))
         return nil 
     end
     
@@ -55,11 +55,11 @@ local function loadLocal(path)
 end
 
 local function boot()
-    if getgenv().RedDragon.IsLocal then
-        print("[Red Dragon] Booting in LOCAL mode...")
+    if getgenv().KCheat.IsLocal then
+        print("[K. Cheat] Booting in LOCAL mode...")
         loadLocal("src/loader.lua")
     else
-        print("[Red Dragon] Booting in REMOTE mode...")
+        print("[K. Cheat] Booting in REMOTE mode...")
         loadRemote("src/loader.lua")
     end
 end

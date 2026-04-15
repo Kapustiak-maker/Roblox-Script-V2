@@ -7,13 +7,13 @@ A professional-grade, modular Roblox script hub with a premium red-themed UI.
 - **Visuals**: Box ESP, Fullbright.
 - **Utility**: Rejoin, Server Hop, Infinite Yield.
 - **Modular**: One file per function for easy expansion.
-- **Automated Sync**: One-click updates to GitHub.
+- **Automated Sync**: One-click updates to GitHub using `Sync.ps1`.
 
 ## 📦 Execution
 Paste the following code into your executor (Solara, Celery, Electron, etc.):
 
 ```lua
-loadstring(game:HttpGet('https://raw.githubusercontent.com/Kapustiak-maker/Roblox-Multifunctional/main/main.lua'))()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/Kapustiak-maker/Roblox-Script-V2/main/main.lua'))()
 ```
 
 ## 🛠️ Development

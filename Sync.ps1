@@ -1,9 +1,9 @@
 # Red Dragon Hub - GitHub Sync Script
 # Adopted workflow from Kapustiak-maker's configuration
 
-Write-Host "====================================" -ForegroundColor Red
-Write-Host "   RED DRAGON REPO SYNC (V2)" -ForegroundColor White
-Write-Host "====================================" -ForegroundColor Red
+Write-Host "====================================" -ForegroundColor Magenta
+Write-Host "   K. CHEAT REPO SYNC (V2)" -ForegroundColor White
+Write-Host "====================================" -ForegroundColor Magenta
 
 $repoUrl = "https://github.com/Kapustiak-maker/Roblox-Script-V2.git"
 
@@ -20,7 +20,7 @@ git add -A
 
 Write-Host "[>] Committing..." -ForegroundColor Gray
 $date = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-git commit -m "Update Red Dragon: $date"
+git commit -m "K. Cheat Update: $date"
 
 Write-Host "[>] Force Pushing to GitHub (origin master:main)..." -ForegroundColor Gray
 git push origin master:main --force
