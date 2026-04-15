@@ -36,10 +36,10 @@ local Window = UI:CreateWindow("K. CHEAT")
 KCheat.Window = Window
 
 -- 3. Load Function Modules
--- In the new structure, we load everything from /src/Functions/
--- For now, this is empty as per user request to "remove all functions"
+-- Each function is a separate file in /src/Functions/
 local functions = {
-    -- "src/Functions/Example.lua"
+    "src/Functions/Speed.lua",
+    "src/Functions/Visuals.lua"
 }
 
 print("[K. Cheat] Loading Function Modules...")

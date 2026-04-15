@@ -6,8 +6,9 @@ local CoreGui = game:GetService("CoreGui")
 
 function UI:CreateWindow(title)
     local Window = {
-        CurrentTab = nil,
-        Visible = true
+        CurrentModule = nil,
+        Visible = true,
+        Modules = {}
     }
 
     -- Root GUI
@@ -21,10 +22,10 @@ function UI:CreateWindow(title)
     MainFrame.Name = "MainFrame"
     MainFrame.Parent = ScreenGui
     MainFrame.BackgroundColor3 = Color3.fromRGB(20, 15, 30)
-    MainFrame.BackgroundTransparency = 0.4 -- Half-transparent as requested
+    MainFrame.BackgroundTransparency = 0.4
     MainFrame.BorderSizePixel = 0
-    MainFrame.Position = UDim2.new(0.5, -250, 0.5, -175)
-    MainFrame.Size = UDim2.new(0, 500, 0, 350)
+    MainFrame.Position = UDim2.new(0.5, -275, 0.5, -175)
+    MainFrame.Size = UDim2.new(0, 550, 0, 350)
     MainFrame.ClipsDescendants = false
 
     local MainCorner = Instance.new("UICorner")
@@ -56,7 +57,6 @@ function UI:CreateWindow(title)
     HeaderTitle.TextSize = 18
     HeaderTitle.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- Close Button (Cross)
     local CloseBtn = Instance.new("TextButton")
     CloseBtn.Name = "CloseBtn"
     CloseBtn.Parent = Header
@@ -69,8 +69,6 @@ function UI:CreateWindow(title)
     CloseBtn.TextSize = 24
     
     CloseBtn.MouseButton1Click:Connect(function()
-        -- Shutdown Logic
-        print("[K. Cheat] Shutting down...")
         ScreenGui:Destroy()
         if getgenv().KCheat and getgenv().KCheat.Connections then
             for _, conn in pairs(getgenv().KCheat.Connections) do
@@ -80,31 +78,57 @@ function UI:CreateWindow(title)
         getgenv().KCheat = nil
     end)
 
-    -- Sidebar / Nav
-    local Nav = Instance.new("Frame")
-    Nav.Name = "Nav"
-    Nav.Parent = MainFrame
-    Nav.BackgroundTransparency = 1
-    Nav.Position = UDim2.new(0, 15, 0, 50)
-    Nav.Size = UDim2.new(0, 120, 1, -65)
+    -- Left Pane (Functions)
+    local LeftPane = Instance.new("ScrollingFrame")
+    LeftPane.Name = "LeftPane"
+    LeftPane.Parent = MainFrame
+    LeftPane.BackgroundTransparency = 0.95
+    LeftPane.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    LeftPane.BorderSizePixel = 0
+    LeftPane.Position = UDim2.new(0, 15, 0, 50)
+    LeftPane.Size = UDim2.new(0, 180, 1, -65)
+    LeftPane.ScrollBarThickness = 2
+    LeftPane.ScrollBarImageColor3 = Color3.fromRGB(150, 100, 250)
+    LeftPane.CanvasSize = UDim2.new(0, 0, 0, 0)
+    LeftPane.AutomaticCanvasSize = Enum.AutomaticSize.Y
 
-    local NavLayout = Instance.new("UIListLayout")
-    NavLayout.Parent = Nav
-    NavLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    NavLayout.Padding = UDim.new(0, 8)
+    local LeftLayout = Instance.new("UIListLayout")
+    LeftLayout.Parent = LeftPane
+    LeftLayout.Padding = UDim.new(0, 5)
 
-    -- Container
-    local Container = Instance.new("Frame")
-    Container.Name = "Container"
-    Container.Parent = MainFrame
-    Container.BackgroundTransparency = 0.8
-    Container.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    Container.Position = UDim2.new(0, 150, 0, 60)
-    Container.Size = UDim2.new(1, -165, 1, -75)
+    local LeftPadding = Instance.new("UIPadding")
+    LeftPadding.Parent = LeftPane
+    LeftPadding.PaddingTop = UDim.new(0, 5)
+    LeftPadding.PaddingLeft = UDim.new(0, 5)
+    LeftPadding.PaddingRight = UDim.new(0, 5)
 
-    local ContainerCorner = Instance.new("UICorner")
-    ContainerCorner.CornerRadius = UDim.new(0, 10)
-    ContainerCorner.Parent = Container
+    -- Right Pane (Settings)
+    local RightPane = Instance.new("ScrollingFrame")
+    RightPane.Name = "RightPane"
+    RightPane.Parent = MainFrame
+    RightPane.BackgroundTransparency = 0.9
+    RightPane.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    RightPane.BorderSizePixel = 0
+    RightPane.Position = UDim2.new(0, 210, 0, 50)
+    RightPane.Size = UDim2.new(1, -225, 1, -65)
+    RightPane.ScrollBarThickness = 2
+    RightPane.ScrollBarImageColor3 = Color3.fromRGB(150, 100, 250)
+    RightPane.CanvasSize = UDim2.new(0, 0, 0, 0)
+    RightPane.AutomaticCanvasSize = Enum.AutomaticSize.Y
+
+    local RightCorner = Instance.new("UICorner")
+    RightCorner.CornerRadius = UDim.new(0, 10)
+    RightCorner.Parent = RightPane
+
+    local RightLayout = Instance.new("UIListLayout")
+    RightLayout.Parent = RightPane
+    RightLayout.Padding = UDim.new(0, 8)
+
+    local RightPadding = Instance.new("UIPadding")
+    RightPadding.Parent = RightPane
+    RightPadding.PaddingTop = UDim.new(0, 10)
+    RightPadding.PaddingLeft = UDim.new(0, 10)
+    RightPadding.PaddingRight = UDim.new(0, 10)
 
     -- Dragging
     local dragging, dragInput, dragStart, startPos
@@ -133,79 +157,121 @@ function UI:CreateWindow(title)
         MainFrame.Visible = Window.Visible
     end
 
-    function Window:CreateTab(name)
-        local Tab = {}
+    function Window:CreateModule(name, callback)
+        local Module = {
+            State = false,
+            Container = Instance.new("Frame")
+        }
         
-        local TabButton = Instance.new("TextButton")
-        TabButton.Parent = Nav
-        TabButton.BackgroundColor3 = Color3.fromRGB(150, 100, 250)
-        TabButton.BackgroundTransparency = 0.8
-        TabButton.Size = UDim2.new(1, 0, 0, 32)
-        TabButton.Font = Enum.Font.GothamSemibold
-        TabButton.Text = name
-        TabButton.TextColor3 = Color3.fromRGB(200, 200, 200)
-        TabButton.TextSize = 13
-        TabButton.AutoButtonColor = false
+        -- Settings container for this module
+        Module.Container.Name = name .. "_Settings"
+        Module.Container.Parent = RightPane
+        Module.Container.BackgroundTransparency = 1
+        Module.Container.Size = UDim2.new(1, 0, 0, 0)
+        Module.Container.AutomaticSize = Enum.AutomaticSize.Y
+        Module.Container.Visible = false
+        
+        local ContainerLayout = Instance.new("UIListLayout")
+        ContainerLayout.Parent = Module.Container
+        ContainerLayout.Padding = UDim.new(0, 8)
 
-        local TabCorner = Instance.new("UICorner")
-        TabCorner.CornerRadius = UDim.new(0, 6)
-        TabCorner.Parent = TabButton
+        local ModBtn = Instance.new("TextButton")
+        ModBtn.Name = name .. "_Btn"
+        ModBtn.Parent = LeftPane
+        ModBtn.BackgroundColor3 = Color3.fromRGB(40, 30, 60)
+        ModBtn.Size = UDim2.new(1, 0, 0, 40)
+        ModBtn.Font = Enum.Font.GothamSemibold
+        ModBtn.Text = name
+        ModBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+        ModBtn.TextSize = 13
+        ModBtn.AutoButtonColor = false
 
-        local Page = Instance.new("ScrollingFrame")
-        Page.Name = name .. "_Page"
-        Page.Parent = Container
-        Page.BackgroundTransparency = 1
-        Page.BorderSizePixel = 0
-        Page.Size = UDim2.new(1, 0, 1, 0)
-        Page.Visible = false
-        Page.ScrollBarThickness = 0
+        local BtnCorner = Instance.new("UICorner")
+        BtnCorner.CornerRadius = UDim.new(0, 8)
+        BtnCorner.Parent = ModBtn
 
-        local PageLayout = Instance.new("UIListLayout")
-        PageLayout.Parent = Page
-        PageLayout.Padding = UDim.new(0, 10)
-
-        local PagePadding = Instance.new("UIPadding")
-        PagePadding.Parent = Page
-        PagePadding.PaddingTop = UDim.new(0, 10)
-        PagePadding.PaddingLeft = UDim.new(0, 10)
-        PagePadding.PaddingRight = UDim.new(0, 10)
-
-        TabButton.MouseButton1Click:Connect(function()
-            for _, v in pairs(Container:GetChildren()) do if v:IsA("ScrollingFrame") then v.Visible = false end end
-            for _, v in pairs(Nav:GetChildren()) do if v:IsA("TextButton") then
-                TweenService:Create(v, TweenInfo.new(0.2), {BackgroundTransparency = 0.8, TextColor3 = Color3.fromRGB(200, 200, 200)}):Play()
-            end end
-            Page.Visible = true
-            TweenService:Create(TabButton, TweenInfo.new(0.2), {BackgroundTransparency = 0.2, TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-        end)
-
-        if not Window.CurrentTab then
-            Window.CurrentTab = Tab
-            Page.Visible = true
-            TabButton.BackgroundTransparency = 0.2
-            TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        local function updateAppearance()
+            if Module.State then
+                TweenService:Create(ModBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(150, 100, 250), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+            else
+                TweenService:Create(ModBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 30, 60), TextColor3 = Color3.fromRGB(180, 180, 180)}):Play()
+            end
         end
 
-        function Tab:CreateButton(text, callback)
+        local function showSettings()
+            for _, v in pairs(RightPane:GetChildren()) do
+                if v:IsA("Frame") then v.Visible = false end
+            end
+            Module.Container.Visible = true
+            Window.CurrentModule = Module
+        end
+
+        ModBtn.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                Module.State = not Module.State
+                updateAppearance()
+                callback(Module.State)
+            elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
+                showSettings()
+            end
+        end)
+
+        -- Components nested in settings
+        function Module:CreateToggle(text, default, toggleCallback)
+            local Toggled = default or false
+            local ToggleFrame = Instance.new("TextButton")
+            ToggleFrame.Parent = Module.Container
+            ToggleFrame.BackgroundColor3 = Color3.fromRGB(30, 25, 50)
+            ToggleFrame.Size = UDim2.new(1, 0, 0, 35)
+            ToggleFrame.Text = ""
+            ToggleFrame.AutoButtonColor = false
+            
+            local TCorner = Instance.new("UICorner")
+            TCorner.CornerRadius = UDim.new(0, 6)
+            TCorner.Parent = ToggleFrame
+            
+            local TText = Instance.new("TextLabel")
+            TText.Parent = ToggleFrame
+            TText.BackgroundTransparency = 1
+            TText.Position = UDim2.new(0, 10, 0, 0)
+            TText.Size = UDim2.new(1, -40, 1, 0)
+            TText.Font = Enum.Font.GothamSemibold
+            TText.Text = text
+            TText.TextColor3 = Color3.fromRGB(220, 220, 220)
+            TText.TextXAlignment = Enum.TextXAlignment.Left
+            
+            local Box = Instance.new("Frame")
+            Box.Parent = ToggleFrame
+            Box.BackgroundColor3 = Toggled and Color3.fromRGB(150, 100, 250) or Color3.fromRGB(60, 50, 80)
+            Box.Position = UDim2.new(1, -30, 0.5, -9)
+            Box.Size = UDim2.new(0, 18, 0, 18)
+            Instance.new("UICorner", Box).CornerRadius = UDim.new(0, 4)
+            
+            ToggleFrame.MouseButton1Click:Connect(function()
+                Toggled = not Toggled
+                TweenService:Create(Box, TweenInfo.new(0.2), {BackgroundColor3 = Toggled and Color3.fromRGB(150, 100, 250) or Color3.fromRGB(60, 50, 80)}):Play()
+                toggleCallback(Toggled)
+            end)
+        end
+
+        function Module:CreateButton(text, btnCallback)
             local Button = Instance.new("TextButton")
-            Button.Parent = Page
-            Button.BackgroundColor3 = Color3.fromRGB(150, 100, 250)
-            Button.BackgroundTransparency = 0.7
+            Button.Parent = Module.Container
+            Button.BackgroundColor3 = Color3.fromRGB(35, 30, 60)
             Button.Size = UDim2.new(1, 0, 0, 35)
             Button.Font = Enum.Font.GothamSemibold
             Button.Text = text
-            Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-            Button.TextSize = 14
-            Button.AutoButtonColor = false
-
-            local BtnCorner = Instance.new("UICorner")
-            BtnCorner.CornerRadius = UDim.new(0, 8)
-            BtnCorner.Parent = Button
-
-            Button.MouseButton1Click:Connect(callback)
+            Button.TextColor3 = Color3.fromRGB(240, 240, 240)
+            Instance.new("UICorner", Button).CornerRadius = UDim.new(0, 6)
+            Button.MouseButton1Click:Connect(btnCallback)
         end
 
-        return Tab
+        -- Auto-select first module settings
+        if #LeftPane:GetChildren() <= 3 then -- Taking into account layout and pads
+            task.defer(showSettings)
+        end
+
+        return Module
     end
 
     return Window
